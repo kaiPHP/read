@@ -6,7 +6,7 @@
       <div class="desc">分享100元预购抵用券，好友下单也可享受预购优惠。 好友完成下单，你还能获得50元奖励金，奖励金可通过早晚读书公众号提现。</div>
       <div class="desc">活动结束倒计时：7天23小时</div>
       <div class="infobox">
-        <div class="tel">当前帐号：188****1165</div>
+        <div class="tel">当前帐号：{{result.mobile}}</div>
         <div class="mycard">我的会员激活码</div>
       </div>
       <input type="button" value="去分享" class="btn" />
@@ -17,47 +17,65 @@
         </li>
         <li>
           <span>全部返利</span>
-          <span>¥100</span>
+          <span>¥{{result.rebackMoney}}</span>
         </li>
         <li>
           <span>已提现</span>
-          <span>¥50</span>
+          <span>¥{{result.userwithdraw}}</span>
         </li>
         <li>
           <span>可提现</span>
-          <span>¥50</span>
+          <span>¥{{result.withdraw}}</span>
         </li>
       </ul>
       <div class="tab-box">
-        <div class="title">我的邀请记录（2）</div>
-        <table class="tab">
+        <div class="title">我的邀请记录（{{record.length}}）</div>
+        <table class="tab" v-if="record.length">
           <tr>
             <th>被邀请人</th>
             <th>返利</th>
             <th>购买时间</th>
           </tr>
-          <tr>
-            <td>188****1165</td>
-            <td>¥50</td>
-            <td>04-23 12:22</td>
-          </tr>
-          <tr>
-            <td>188****1165</td>
-            <td>¥50</td>
-            <td>04-23 12:22</td>
+          <tr v-for="(item, index) in record" :key="index">
+            <td>{{item.name}}</td>
+            <td>¥{{item.money}}</td>
+            <td>getLocalTime(item.time)</td>
           </tr>
         </table>
       </div>
+      <div class="empty">暂无记录</div>
     </div>
-    <packetbox></packetbox>
-    <div class="mask"></div>
+    <packetbox :isShow="isShow"></packetbox>
+    <div class="mask" v-show="isShow"></div>
   </div>
 </template>
 
 <script>
 import Packetbox from '@/components/packet-box'
 export default {
-  name: "index",
+  name: "tgplan",
+  data(){
+    return {
+      isShow: false, //是否显示我的激活码
+      result: {}, // 查询结果
+      record: [] //邀请记录
+    }
+  },
+  created(){
+    this.$loading.show({
+      el: this.$refs.loading
+    })
+    this.axiosPost('v/act/withdrawal',{}).then((res) => { // 提现接口查询
+      this.$loading.hide()
+      this.result = res.data.attachment
+      this.record = res.data.attachment.lmcwInviterVo
+    })
+  },
+  methods: {
+    getLocalTime(nS) {     
+      return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/,' ');     
+    }
+  },
   components: {
     Packetbox
   }
@@ -164,8 +182,14 @@ export default {
           text-align center
           color #333
           line-height .7rem
+          font-size .24rem
         th
           background #F0F0F0
+    .empty
+      color #888
+      font-size .3rem
+      margin .5rem auto
+      text-align center
     .btn
       background linear-gradient(135deg,rgba(255,70,70,1) 0%,rgba(231,27,52,1) 100%)
       border-radius .2rem
@@ -177,10 +201,11 @@ export default {
       color #fff
 .mask
   width 100%
-  height calc(100vh)
   background rgba(0,0,0,0.5)
   z-index 100
   position absolute
   top 0
   left 0
+  bottom 0
+  right 0
   </style>

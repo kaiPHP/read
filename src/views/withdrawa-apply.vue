@@ -5,9 +5,7 @@
       <h2>申请提现</h2>
       <div class="desc">可提现余额：¥50</div>
       <ul>
-        <li class="on">¥50</li>
-        <li>¥100</li>
-        <li>¥200</li>
+        <li v-for="(item, index) in moneyArr" :key="index">¥{{item}}</li>
       </ul>
       <div class="btnbox">
         <input type="button" value="返回" class="back" />
@@ -15,24 +13,20 @@
       </div>
       <div class="tab-box">
         <div class="title">提现记录</div>
-        <table class="tab">
+        <table class="tab" v-if="records.length">
           <tr>
             <th>申请时间</th>
             <th>金额</th>
             <th>处理状态</th>
           </tr>
-          <tr>
-            <td>2019-04-04</td>
-            <td>¥50</td>
-            <td>处理中</td>
-          </tr>
-          <tr>
-            <td>2019-04-04</td>
-            <td>¥50</td>
-            <td>已完成</td>
+          <tr v-for="(item, index) in records" :key="index">
+            <td>getLocalTime(item.applyTime)</td>
+            <td>¥{{item.money}}</td>
+            <td>{{item.status === 3 ? '已完成' : '处理中'}}</td>
           </tr>
         </table>
       </div>
+      <div class="empty">暂无记录</div>
       <div class="desc-box">
         <div class="desc">提现说明</div>
         <p>1、提现没有门槛，您可以放心申请提现。</p>
@@ -47,7 +41,29 @@
 
 <script>
 export default {
-  name: "index",
+  name: "withdrawaapply",
+  data(){
+    return {
+      moneyArr: [],
+      records: []
+    }
+  },
+  created(){
+    this.$loading.show({
+      el: this.$refs.loading
+    })
+    this.axiosPost('v/act/withdrawalView',{}).then((res) => { // 获取红包
+      this.$loading.hide()
+      this.moneyArr = res.data.attachment.money
+      this.records = res.data.attachment.record
+      console.log(this.moneyArr)
+    })
+  },
+  methods: {
+    getLocalTime(nS) {     
+      return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/,' ');     
+    }
+  },
   components: {
   }
 };
@@ -147,10 +163,17 @@ export default {
         td,th
           border 1px solid #E1E1E1
           text-align center
+          font-size .24rem
           color #333
           line-height .7rem
         th
           background #F0F0F0
+    .empty
+      text-align center
+      color #888
+      font-size .3rem
+      margin .5rem auto
+      width 2rem
     .btnbox
       width 100%
       display flex
