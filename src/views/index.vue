@@ -2,8 +2,8 @@
   <div class="container">
     <div class="logo"></div>
     <div class="red-packet">
-      <div class="user"><img src="/images/user.png" alt=""></div>
-      <p>小福同学</p>
+      <div class="user"><img :src="info.headurl || '/images/user.png'" alt=""></div>
+      <p>{{info.send}}同学</p>
       <p>给你发了一个红包</p>
       <h2>献给爱读书的你</h2>
       <input type="button" value="" @click="openFn" class="btn" />
@@ -19,8 +19,20 @@ export default {
   name: "index",
   data() {
     return {
-      isShow: false
+      isShow: false,
+      info: {} //用户信息
     }
+  },
+  created(){
+    this.$loading.show({
+      el: this.$refs.loading
+    })
+    this.axiosPost('act/giveCoupon',{ // 未登陆 获取用户信息
+      result: ''
+    }).then((res) => {
+      this.info = res.data.attachment
+      this.$loading.hide()
+    })
   },
   methods: {
     openFn(){

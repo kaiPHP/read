@@ -17,7 +17,7 @@
           <div class="aside">¥ 265</div>
         </li>
       </ul>
-      <input type="button" value="确认支付" class="btn" />
+      <input type="button" value="确认支付" @click="payFn" class="btn" />
       <div class="desc-box">
         <div class="desc">购买说明：</div>
         <p>1、支付成功后将获得会员激活码，激活码有效期至2020年5月，待读书会产品上线后，在此之前的任意时间都可以选择激活，从激活后的第二个自然日开始计算会员时长，为期1年（366天）。</p>
@@ -36,6 +36,11 @@ export default {
   data() {
     return {
       isShow: false
+    }
+  },
+  methods: {
+    payFn(){
+      this.$router.push('/successbuy')
     }
   },
   components: {

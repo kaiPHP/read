@@ -83,7 +83,7 @@
         <p>2. 购买后，还可获得多个限时优惠100元红包，可赠送给好友使用；</p>
         <p>3. 好友通过你赠送的100元优惠券购买会员卡，支付成功后，你将获得50元现金返利，可立刻提现。</p>
       </div>
-      <input type="button" class="btn" value="立即购买" />
+      <input type="button" class="btn" value="立即购买" @click="buyFn" />
     </div>
   </div>
 </template>
@@ -91,6 +91,11 @@
 <script>
 export default {
   name: "card",
+  methods: {
+    buyFn(){
+      this.$router.push('/memberpay')
+    }
+  },
   components: {
   }
 };

@@ -3,9 +3,14 @@
     <div class="logo"></div>
     <div class="red-packet">
       <h2>申请提现</h2>
-      <div class="desc">可提现余额：¥50</div>
+      <div class="desc">可提现余额：¥{{ableBalance}}</div>
       <ul>
-        <li v-for="(item, index) in moneyArr" :key="index">¥{{item}}</li>
+        <li 
+        v-for="(item, index) in moneyArr" 
+        :key="index" 
+        :class="index == active ? 'on' : ''"
+        @click="select(item, index)"
+        >¥{{item}}</li>
       </ul>
       <div class="btnbox">
         <input type="button" value="返回" class="back" />
@@ -44,8 +49,10 @@ export default {
   name: "withdrawaapply",
   data(){
     return {
-      moneyArr: [],
-      records: []
+      active: 0,  //默认选中50元
+      ableBalance: 0, // 可提现余额
+      moneyArr: [],   //金额列表
+      records: []     // 记录列表
     }
   },
   created(){
@@ -56,12 +63,19 @@ export default {
       this.$loading.hide()
       this.moneyArr = res.data.attachment.money
       this.records = res.data.attachment.record
-      console.log(this.moneyArr)
+      this.ableBalance = res.data.attachment.withdraw
     })
   },
   methods: {
     getLocalTime(nS) {     
       return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/,' ');     
+    },
+    select(item, index){
+      if(this.ableBalance >= item){
+        this.active = index
+      }else{
+        this.$toast({message: '余额不足！'})
+      }
     }
   },
   components: {

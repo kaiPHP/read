@@ -20,14 +20,19 @@
         <p>早晚读书推广大使计划是在产品预售阶段的一个新的尝试，早晚读书处于起步阶段，需要热爱读书的广大书友帮助，早晚读书尝试在保有运营成本的基础上，最大力度让利给初期支持我们的用户。</p>
         <p>古人云书中自有黄金屋，希望我们初期的书友可以跟我们一起成长一起收获。</p>
       </div>
-      <input type="button" value="查看推广大使计划" class="btn" />
+      <input type="button" value="查看推广大使计划" class="btn" @click="tgFn" />
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "index",
+  name: "successbug",
+  methods: {
+    tgFn(){
+      this.$router.push('/tgplan')
+    }
+  },
   components: {
   }
 };

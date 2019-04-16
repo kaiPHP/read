@@ -13,7 +13,7 @@
       <ul>
         <li>
           <span class="side">我的返利金额</span>
-          <span class="aside">去提现</span>
+          <span class="aside" @click="withdrawFn">去提现</span>
         </li>
         <li>
           <span>全部返利</span>
@@ -74,6 +74,9 @@ export default {
   methods: {
     getLocalTime(nS) {     
       return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/,' ');     
+    },
+    withdrawFn(){
+      this.$router.push('/withdrawaapply')
     }
   },
   components: {

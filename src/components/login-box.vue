@@ -9,15 +9,16 @@
       <li>
         <input type="text" v-model="smsCode" placeholder="请输入验证码" />
         <!-- <span>重新发送 (59)</span> -->
-        <span @click="getCode">获取验证码</span>
+        <span @click="getCode" :class="isYzmDisable ? 'disabled' : ''">{{info}}</span>
       </li>
     </ul>
-    <input type="button" class="login-btn" @click="loginFn" value="立即登录" />
+    <input type="button" class="btn" @click="loginFn" :disabled="isDisable" value="立即登录" />
     <div class="close" @click="close"></div>
   </div>
 </template>
 
 <script>
+import { setTimeout } from 'timers';
 export default {
   name: 'loginbox',
   props: [
@@ -25,9 +26,29 @@ export default {
   ],
   data(){
     return {
-      tel: '',
-      smsCode: '',
-      loginType: 1
+      tel: '',  //手机号
+      smsCode: '',   //验证码
+      loginType: 1,
+      timer: null,  //定时器
+      info: '获取验证码',
+      isDisable: true,
+      isYzmDisable: true
+    }
+  },
+  watch: {
+    tel: function(val, oldval){
+      if(val.length === 11 && /^[1][0-9]{10}$/.test(val)){
+        this.isYzmDisable = false
+      }else{
+        this.isYzmDisable = true
+      }
+    },
+    smsCode: function(val, oldval){
+      if(!this.isYzmDisable && val.length === 6 && /^\d{6}$/.test(val)){
+        this.isDisable = false
+      }else{
+        this.isDisable = true
+      }
     }
   },
   methods: {
@@ -35,10 +56,18 @@ export default {
       this.$emit('closeFn', false)
     },
     getCode(){
-      if(!this.tel){
-        alert('请输入手机号')
-        return
-      }
+      if(this.isYzmDisable) return
+      if(this.timer) clearInterval(this.timer)
+      let time = 60
+      this.timer = setInterval(() => {
+        if(time <= 0){
+          clearInterval(this.timer)
+          this.info = '获取验证码'
+          return
+        }
+        time--
+        this.info = `重新发送 (${time})`
+      }, 1000)
       this.$loading.show({
         el: this.$refs.loading
       })
@@ -57,6 +86,7 @@ export default {
       })
     },
     loginFn(){
+      if(this.isDisable) return
       this.$loading.show({
         el: this.$refs.loading
       })
@@ -137,15 +167,8 @@ export default {
             font-size .3rem
             color #333
             cursor pointer
-    .login-btn
-      width 5rem
-      height .98rem
-      background linear-gradient(135deg,rgba(255,70,70,1) 0%,rgba(231,27,52,1) 100%)
-      border-radius .2rem
-      border none
-      cursor pointer
-      font-size .36rem
-      color #fff
-      line-height .5rem
+            &.disabled
+              color #ccc
+    .btn
       margin-top .4rem
 </style>

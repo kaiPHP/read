@@ -40,9 +40,6 @@ function axiosPost(url, data) {
       if(res.data.errCode){
         this.$toast({message: res.data.message})
         this.$loading.hide()
-        if(res.data.errCode === 60){ //已经领取过红包
-          this.$router.push('/memberpay')
-        }
         return
       }
       resolve(res)

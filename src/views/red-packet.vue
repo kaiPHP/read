@@ -12,8 +12,8 @@
         <p>2、每笔订单只能使用一张优惠券。</p>
       </div>
     </div>
-    <input type="button" value="去使用" @click="goUse" class="btn" />
-    <input type="button" value="我的邀请" class="btn invite" />
+    <input type="button" value="去使用" @click="goUseFn" class="btn" />
+    <input type="button" value="我的邀请" @click="inviteFn" class="btn invite" />
     <div class="bottom-box">
       <h2>早晚读书返现50元活动说明：</h2>
       <p>1、购买成功后，还可以获得专属限时优惠券。注意，必须购买完成后分享才有效。</p>
@@ -32,14 +32,17 @@ export default {
       })
       this.axiosPost('v/act/applyCoupon',{ // 领取红包
         result: ''
-      }).then((res) => {
+      }).then(() => {
         this.$loading.hide()
       })
     }
   },
   methods: {
-    goUse(){
-      this.$router.push('/memberpay')
+    goUseFn(){
+      this.$router.push('/card')
+    },
+    inviteFn(){
+      this.$router.push('/tgplan')
     }
   },
   components: {
