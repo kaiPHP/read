@@ -9,7 +9,7 @@
       <input type="button" value="" @click="openFn" class="btn" />
     </div>
     <loginbox :isShow="isShow" @closeFn="closeFn"></loginbox>
-    <div class="mask" v-show="isShow"></div>
+    <div class="mask" @click="closeFn(false)" v-show="isShow"></div>
   </div>
 </template>
 

@@ -1,34 +1,9 @@
 <template>
   <div class="packet-box" v-show="isShow" ref="loading">
     <p>我的红包</p>
-    <ul>
-      <li>
-        <p class="name">李国庆早晚读书会公众号赠送</p>
-        <p class="number">
-          <span>100元代金券</span>
-          <span class="radio"></span>
-        </p>
-      </li>
-      <li>
-        <p class="name">MT（微信昵称）赠送</p>
-        <p class="number">
-          <span>100元代金券</span>
-          <span class="radio on"></span>
-        </p>
-      </li>
-    </ul>
-    <!-- <ul class="dhm">
-      <li>
-        <span>ADSJLD1NH3KH8KF9</span>
-        <input type="button" value="复制" class="btn" />
-      </li>
-      <li>
-        <span>ADSJLD1NH3KH8KF9</span>
-        <input type="button" value="复制" class="btn" />
-      </li>
-    </ul> -->
+    <slot></slot>
     <!-- <div class="empty">关注微信公众号“早晚读书” 可限时领取100元优惠券</div> -->
-    <div class="close"></div>
+    <div class="close" @click="close"></div>
   </div>
 </template>
 
@@ -38,13 +13,10 @@ export default {
   props: [
     'isShow'
   ],
-  created(){
-    this.$loading.show({
-      el: this.$refs.loading
-    })
-    this.axiosPost('v/act/myCouponView',{}).then((res) => { // 获取红包
-      this.$loading.hide()
-    })
+  methods: {
+    close(){
+      this.$emit('closeFn', false)
+    }
   }
 }
 </script>
@@ -130,4 +102,21 @@ export default {
       line-height .42rem
       width 3.9rem
       margin .5rem auto 0
+    .btn-box
+      display flex
+      justify-content flex-end
+      align-items center
+      margin 15px 15px 0
+      width 90%
+      .smalbtn
+        background none 
+        border none
+        font-size .3rem
+        margin-left .2rem
+        cursor pointer
+        &:last-child
+          color red
+    .emptybox
+      width 100%
+      text-align left     
 </style>

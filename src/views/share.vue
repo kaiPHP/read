@@ -1,9 +1,9 @@
 <template>
   <div class="page">
-    <div class="container">
+    <div class="container" :style="cssTest">
       <div class="onebox">
         <h2>你的好友</h2>
-        <h2>小夫同学 邀请你加入</h2>
+        <h2>{{info.nickName}}同学 邀请你加入</h2>
         <h3>李国庆早晚读书会</h3>
       </div>
       <ul>
@@ -18,15 +18,56 @@
     </div>
     <div class="desc">长按图片可保存至本地</div>
     <div class="btnbox">
-      <input type="button" value="返回" class="back" />
-      <input type="button" value="分享链接" class="btn" />
+      <input type="button" @click="back" value="返回" class="back" />
+      <input type="button" @click="shareFn" value="分享链接" class="btn" />
+    </div>
+    <div v-show="isShow">
+      <div class="mask" @click="hide"></div>
+      <div class="arr-box"></div>
+      <div class="arr-text">点击这里可以分享</div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "index",
+  name: "share",
+  data(){
+    return {
+      info: {},
+      isShow: false
+    }
+  },
+  computed: {
+    cssTest(){
+      return {
+        'background': `#fff url(${this.info.imageUrl}) no-repeat`,
+        'background-size': '100% auto'
+      }
+    }
+  },
+  created(){
+    this.$loading.show({
+      el: this.$refs.loading
+    })
+    this.axiosPost("v/act/toShare", { // 获取分享url
+      appUrl: window.location.href
+    }).then((res) => {
+      this.info = res.data.attachment
+      this.$loading.hide()
+    })
+  },
+  methods: {
+    shareFn(){
+      this.isShow = true
+    },
+    hide(){
+      this.isShow = false
+    },
+    back(){
+      this.$router.go(-1)
+    }
+  },
   components: {
   }
 };
@@ -34,6 +75,33 @@ export default {
 
 <style lang="stylus" scoped>
 .page
+  .mask
+    width 100%
+    background rgba(0,0,0,0.7)
+    z-index 100
+    position absolute
+    top 0
+    left 0
+    bottom 0
+    right 0
+  .arr-box
+    background url('/images/arr.png') no-repeat
+    background-size 100% auto
+    width 1.35rem
+    height 1.73rem
+    position absolute
+    top .2rem
+    right .2rem
+    z-index 101
+  .arr-text
+    font-size .36rem
+    font-weight bold
+    color #fff
+    position absolute
+    top 2rem
+    left 50%
+    transform translateX(-50%)
+    z-index 101
   .container
     width 6.7rem
     height 9rem

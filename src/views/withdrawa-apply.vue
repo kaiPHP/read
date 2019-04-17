@@ -13,8 +13,8 @@
         >¥{{item}}</li>
       </ul>
       <div class="btnbox">
-        <input type="button" value="返回" class="back" />
-        <input type="button" value="申请提现" class="btn" />
+        <input type="button" @click="back" value="返回" class="back" />
+        <input type="button" @click="withdrawalFn" value="申请提现" class="btn" />
       </div>
       <div class="tab-box">
         <div class="title">提现记录</div>
@@ -25,7 +25,7 @@
             <th>处理状态</th>
           </tr>
           <tr v-for="(item, index) in records" :key="index">
-            <td>getLocalTime(item.applyTime)</td>
+            <td>{{getLocalTime(item.applyTime)}}</td>
             <td>¥{{item.money}}</td>
             <td>{{item.status === 3 ? '已完成' : '处理中'}}</td>
           </tr>
@@ -67,8 +67,9 @@ export default {
     })
   },
   methods: {
-    getLocalTime(nS) {     
-      return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/,' ');     
+    getLocalTime(nS) {   
+      let time = new Date(parseInt(nS))
+      return time.getFullYear() + '-' + ('0' + time.getMonth()).substring(-2) + '-' + time.getDate()
     },
     select(item, index){
       if(this.ableBalance >= item){
@@ -76,6 +77,21 @@ export default {
       }else{
         this.$toast({message: '余额不足！'})
       }
+    },
+    withdrawalFn(){
+      this.$loading.show({
+        el: this.$refs.loading
+      });
+      this.axiosPost("v/act/applyWithdrawalView", {  //申请提现
+        money: this.moneyArr[this.active]
+      }).then(res => {
+        this.$toast({message: res.data.attachment})
+        this.$loading.hide()
+        this.$router.go(0)
+      });
+    },
+    back(){
+      this.$router.go(-1)
     }
   },
   components: {

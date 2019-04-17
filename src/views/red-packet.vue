@@ -3,9 +3,9 @@
     <div class="logo"></div>
     <div class="red-packet">
       <div class="title">献给热爱读书的你</div>
-      <div class="money"><span class="sub">¥</span>100.00</div>
-      <div class="user"><img src="/images/user2.png" alt=""></div>
-      <p>小福同学 的红包</p>
+      <div class="money"><span class="sub">¥</span>{{info.money}}</div>
+      <div class="user"><img :src="info.headurl" alt=""></div>
+      <p>{{info.send}}同学 的红包</p>
       <div class="desc-box">
         <div class="desc">红包说明：</div>
         <p>1、红包已发放到您的账户中，在下单时选择代金券支付，即可立减100元。</p>
@@ -25,6 +25,15 @@
 <script>
 export default {
   name: "redpacket",
+  data(){
+    return {
+      info: {
+        money: 0,
+        send: '小福',
+        headurl: '/images/user2.png'
+      }
+    }
+  },
   created(){
     if(localStorage.getItem('uid')){
       this.$loading.show({
@@ -32,7 +41,8 @@ export default {
       })
       this.axiosPost('v/act/applyCoupon',{ // 领取红包
         result: ''
-      }).then(() => {
+      }).then((res) => {
+        this.info = res.data.attachment
         this.$loading.hide()
       })
     }

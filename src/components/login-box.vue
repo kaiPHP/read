@@ -36,14 +36,14 @@ export default {
     }
   },
   watch: {
-    tel: function(val, oldval){
+    tel: function(val){
       if(val.length === 11 && /^[1][0-9]{10}$/.test(val)){
         this.isYzmDisable = false
       }else{
         this.isYzmDisable = true
       }
     },
-    smsCode: function(val, oldval){
+    smsCode: function(val){
       if(!this.isYzmDisable && val.length === 6 && /^\d{6}$/.test(val)){
         this.isDisable = false
       }else{

@@ -3,13 +3,13 @@
     <div class="logo"></div>
     <div class="red-packet">
       <h2>早晚读书推广大使计划</h2>
-      <div class="desc">分享100元预购抵用券，好友下单也可享受预购优惠。 好友完成下单，你还能获得50元奖励金，奖励金可通过早晚读书公众号提现。</div>
+      <div class="desc">分享100元预购抵用券，好友下单也可享受预购优惠。 好友完成下单，你还能获得{{result.money}}元奖励金，奖励金可通过早晚读书公众号提现。</div>
       <div class="desc">活动结束倒计时：7天23小时</div>
       <div class="infobox">
         <div class="tel">当前帐号：{{result.mobile}}</div>
-        <div class="mycard">我的会员激活码</div>
+        <div class="mycard" @click="viewCodeFn">我的会员激活码</div>
       </div>
-      <input type="button" value="去分享" class="btn" />
+      <input type="button" @click="shareFn" value="去分享" class="btn" />
       <ul>
         <li>
           <span class="side">我的返利金额</span>
@@ -37,16 +37,33 @@
             <th>购买时间</th>
           </tr>
           <tr v-for="(item, index) in record" :key="index">
-            <td>{{item.name}}</td>
+            <td>{{item.nickname}}</td>
             <td>¥{{item.money}}</td>
-            <td>getLocalTime(item.time)</td>
+            <td>{{getLocalTime(item.time)}}</td>
           </tr>
         </table>
+        <div v-else class="empty">暂无记录</div>
       </div>
-      <div class="empty">暂无记录</div>
     </div>
-    <packetbox :isShow="isShow"></packetbox>
-    <div class="mask" v-show="isShow"></div>
+    <packetbox :isShow="isShow">
+      <div v-if="isSucc">
+        <ul class="dhm" v-if="activeCode.length ">
+          <li v-for="(item, index) in activeCode" :key="index">
+            <span>{{item}}</span>
+            <input type="button" value="复制" class="btn" />
+          </li>
+        </ul>
+        <div v-else class="empty">暂无激活码</div>
+      </div>
+      <div class="emptybox" v-else>
+        <div class="empty">你还没有购买预售会员卡，现在购买可获得专星红包，分享红包邀请好友下单，可获得50元返现哦~</div>
+        <div class="btn-box">
+          <input type="button" @click="goshareFn" class="smalbtn" value="直接分享" />
+          <input type="button" @click="goBuyFn" class="smalbtn" value="立即购买" />
+        </div>
+      </div>
+    </packetbox>
+    <div class="mask" @click="closeFn(false)" v-show="isShow"></div>
   </div>
 </template>
 
@@ -58,7 +75,9 @@ export default {
     return {
       isShow: false, //是否显示我的激活码
       result: {}, // 查询结果
-      record: [] //邀请记录
+      record: [], //邀请记录
+      activeCode: [], // 激活码
+      isSucc: true // 是否购买会员卡成功
     }
   },
   created(){
@@ -73,10 +92,47 @@ export default {
   },
   methods: {
     getLocalTime(nS) {     
-      return new Date(parseInt(nS)).toLocaleString().replace(/:\d{1,2}$/,' ');     
+      let time = new Date(parseInt(nS))
+      return time.getFullYear() + '-' + ('0' + time.getMonth()).substring(-2) + '-' + time.getDate()  
     },
-    withdrawFn(){
+    withdrawFn(){ // 去提现
       this.$router.push('/withdrawaapply')
+    },
+    viewCodeFn(){  //查看我的激活码
+      this.$loading.show({
+        el: this.$refs.loading
+      });
+      this.axiosPost("v/act/buySuccess", {}) 
+        .then(res => {
+          this.activeCode = res.data.attachment
+          this.isShow = true
+          this.$loading.hide()
+        })
+    },
+    shareFn(){ // 去分享
+      this.$loading.show({
+        el: this.$refs.loading
+      })
+      this.axiosPost("v/act/toShare", { 
+        appUrl: window.location.href
+      }).then(() => {
+        this.$loading.hide()
+        this.$router.push('/share')
+        return
+      }).catch((err) => {
+        this.isSucc = false
+        this.isShow = true
+        this.$loading.hide()
+      })
+    },
+    goshareFn(){ //直接分享
+      this.$router.push('/share')
+    },
+    goBuyFn(){
+      this.$router.push('/card')
+    },
+    closeFn(b){
+      this.isShow = b
     }
   },
   components: {
